@@ -1,0 +1,30 @@
+{
+  "name": "wolfram-enhancement",
+  "version": "1.0.0",
+  "description": "a small enhancement using wolframalpha api",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cesarhernar/wolframEnhancement.git"
+  },
+  "author": "cesar hernandez",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cesarhernar/wolframEnhancement/issues"
+  },
+  "homepage": "https://github.com/cesarhernar/wolframEnhancement#readme",
+  "dependencies": {
+    "body-parser": "^1.16.1",
+    "cors": "^2.8.1",
+    "express": "^4.14.1",
+    "pem": "^1.9.4",
+    "request": "^2.79.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  }
+}

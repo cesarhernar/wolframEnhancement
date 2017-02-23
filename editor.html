@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <script defer src="https://d1xa36cy0xt122.cloudfront.net/v1/Mixmax.js"></script>
+    <link href="/css/style.css" rel="stylesheet">
+    <title>Wolframalpha Enhancement</title>
+  </head>
+  <body>
+    <script>
+      class Input { 
+        constructor() {
+        this.inputValue;
+        }
+        generate() {
+          let overallContainer = document.createElement('div');
+          overallContainer.setAttribute('class', 'container');
+          let tableContainer = document.createElement('div');
+          let table = document.createElement('table');
+          let head = table.createTHead();
+          let inputBox = document.createElement('input');
+          inputBox.setAttribute('type', 'text');
+          inputBox.setAttribute('placeholder', 'math f(x) or anything really');
+          inputBox.style = "width: 500px";
+          head.appendChild(inputBox);
+          let row = table.insertRow(0);
+          let submitCancel = row.insertCell(0);
+          let submitButton = new Button('query',null, inputBox);
+          submitCancel.appendChild(submitButton.create(true));
+          let cancelButton = new Button('cancel', Mixmax.cancel);
+          submitCancel.appendChild(cancelButton.create(false));
+          let attach = new Button('attach', attachToEmail);
+          submitCancel.appendChild(attach.create(false));
+          tableContainer.appendChild(table);
+          overallContainer.appendChild(tableContainer);
+          document.body.append(overallContainer);
+        }
+      }
+      class Button { 
+        constructor(type, fn, reference, url) {
+          this.type = type;
+          this.callback = fn;
+          this.link = url;
+          this.reference = reference;
+          this.eventcallback = this.eventcallback.bind(this);
+        }
+        create(checkinput,...classes) {
+          let button = document.createElement('button');
+          button.setAttribute('href', this.url);
+          let value = document.createTextNode(this.type);
+          button.appendChild(value);
+          button.classList.add(...classes);
+          button.addEventListener('click', this.eventcallback(checkinput, this.callback, this.reference));
+          return button;
+        }
+        eventcallback(checkinput, fn, reference) {
+          return (e) => {
+            if (checkinput) {
+              return reference.value.length > 0 ? request(reference.value, reference) : null;
+            }
+            else {
+              return fn();
+            }
+          }
+        }
+      }
+      //make api call to your own server, and make the wolframalpha api call through node\
+      function attachToEmail(){
+        let queryResult = document.getElementById('queryresult').innerHTML;
+        Mixmax.done({queryResult});
+      }
+      function appendTo(container, pod) {
+        pod.subpods.forEach((subpod) => {
+          let encap = document.createElement('div');
+          let image = document.createElement('img');
+          image.style = "padding-bottom: 10px";
+          let title = document.createElement('div');
+          title.setAttribute('id', 'title')
+          title.innerHTML = subpod.title + (subpod.title.length > 0 ? ":" : "");
+          title.style = "color: #F44336; font-family: Lato, sans-serif";
+          image.setAttribute('src', subpod.img.src);
+          image.setAttribute('height', subpod.img.height);
+          image.setAttribute('width', subpod.img.width);
+          encap.appendChild(title);
+          encap.appendChild(image);
+          container.appendChild(encap);
+        })
+      }
+      function appendResponse(response){
+        let display = document.getElementsByClassName('container');
+        display = display[0];
+        let container = document.createElement('div');
+        let pods = response.queryresult.pods;
+        pods ? pods.forEach((sub) => {appendTo(container, sub)}) 
+        : (container.innerHTML = "did you mean " + response.queryresult.didyoumeans[0].val + "?");
+        container.setAttribute('id', 'queryresult');
+        display.appendChild(container);
+      }
+      function request(query, reference) {
+       let xhr = new XMLHttpRequest();
+       xhr.responseType = 'json';
+       xhr.open("GET", `/queryWolframalpha?query=${query}`);
+       xhr.onload = function () {
+        if (xhr.readyState === xhr.DONE) {
+           if (xhr.status === 200){
+             reference.value = '';
+             let container = document.getElementsByClassName('container')[0];
+             let prevresult = document.getElementById('queryresult');
+             prevresult ? container.removeChild(prevresult) : null;
+             appendResponse(xhr.response);
+           }
+         }
+        }
+        xhr.send(null);
+    }
+      document.body.onload = strt;
+      function strt() {
+      let test = new Input();
+      test.generate();
+      }
+    </script>
+  </body>
+</html>
