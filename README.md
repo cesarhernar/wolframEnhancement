@@ -8,5 +8,5 @@ to run:
 
 ```Run: npm start ````
 
-go to https://localhost:8910/editor in your browser to try it out.
+go to ```https://localhost:8910/editor``` in your browser to try it out.
 
